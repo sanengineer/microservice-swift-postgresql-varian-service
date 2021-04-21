@@ -13,7 +13,7 @@ struct VarianController: RouteCollection {
     }
 
     func getAllVarian(req: Request) throws -> EventLoopFuture<[Varian]> {
-        return Varian.query(on: req.db).all()
+         Varian.query(on: req.db).all()
     }
 
     func createVarian(req: Request) throws -> EventLoopFuture<Varian> {

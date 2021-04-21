@@ -1,14 +1,22 @@
 import Fluent
 import Vapor
+import FluentPostgresDriver
 
 func routes(_ app: Application) throws {
-    app.get { req in
-        return "It works!"
-    }
+    
+    let port: Int = Int(Environment.get("VARIAN_PORT")!)!
 
-    app.get("hello") { req -> String in
-        return "Hello, world!"
-    }
+    app.databases.use(.postgres(
+        hostname: Environment.get("DB_HOSTNAME") ?? "localhost",
+        username: Environment.get("DB_USERNAME")!,
+        password: Environment.get("DB_PASSWORD")!,
+        database: Environment.get("DB_NAME")!
+    ), as: .psql)
 
-    try app.register(collection: TodoController())
+    app.migrations.add(CreateVarianSchema())
+    app.logger.logLevel = .debug
+    app.http.server.configuration.port = port
+    
+    try app.autoMigrate().wait()
+    try app.register(collection: VarianController())
 }

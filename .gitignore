@@ -6,4 +6,8 @@ DerivedData/
 .DS_Store
 db.sqlite
 .swiftpm
+Package.resolved
+.env
+.env.development
+.env.production
 

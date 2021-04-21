@@ -7,8 +7,8 @@ struct VarianController: RouteCollection {
         varianRouteGroup.get(use: getAllVarian)
         varianRouteGroup.post(use: createVarian )
         
-        varianRouteGroup.group(":todoID") { varianRoute in
-            varianRoute.get(":varian_id", use: getOneVarian)
+        varianRouteGroup.group(":varian_id") { varianRoute in
+            varianRoute.get(use: getOneVarian)
         }
     }
 

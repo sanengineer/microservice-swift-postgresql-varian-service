@@ -3,11 +3,15 @@ import Vapor
 
 struct VarianController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
-        let varianRouteGroup = routes.grouped("varian")
-        varianRouteGroup.get(use: getAllVarian)
-        varianRouteGroup.post(use: createVarian )
         
-        varianRouteGroup.group(":varian_id") { varianRoute in
+        
+        let varianRouteGroup = routes.grouped("varian")
+        let authVarianRouteGroup = varianRouteGroup.grouped(UserAuthMiddleware())
+        
+        authVarianRouteGroup.get(use: getAllVarian)
+        authVarianRouteGroup.post(use: createVarian )
+        
+        authVarianRouteGroup.group(":varian_id") { varianRoute in
             varianRoute.get(use: getOneVarian)
         }
     }

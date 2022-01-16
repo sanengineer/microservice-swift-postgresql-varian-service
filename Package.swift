@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-postgresql-varian-services",
+    name: "microservice-swift-postgresql-varian-service",
     platforms: [
        .macOS(.v10_15)
     ],

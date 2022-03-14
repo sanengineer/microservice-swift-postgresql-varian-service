@@ -3,17 +3,26 @@ import Vapor
 
 struct VarianController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
-        
+        let superUserMiddleware = SuperUserAuthMiddleware()
+        let midUserMiddleware = MidUserAuthMiddleware()
+        let userMiddleware = UserAuthMiddleware()
         
         let varianRouteGroup = routes.grouped("varian")
-        let authVarianRouteGroup = varianRouteGroup.grouped(UserAuthMiddleware())
+
+        let varianAuthSuperUser = varianRouteGroup.grouped(superUserMiddleware)
+        let varianAuthMidUser = varianRouteGroup.grouped(midUserMiddleware)
+        let varianAuthUser = varianRouteGroup.grouped(userMiddleware)
+
+        // varianAuthSuperUser.delete(":varian_id", use: delete)
         
-        authVarianRouteGroup.get(use: getAllVarian)
-        authVarianRouteGroup.post(use: createVarian )
+        varianAuthUser.get(use: getAllVarian)
+        varianAuthUser.post(use: createVarian )
         
-        authVarianRouteGroup.group(":varian_id") { varianRoute in
+        varianAuthUser.group(":varian_id") { varianRoute in
             varianRoute.get(use: getOneVarian)
         }
+
+        varianAuthUser.delete(":item_id", use: deleteByItemId)
     }
 
     func getAllVarian(req: Request) throws -> EventLoopFuture<[Varian]> {
@@ -28,5 +37,23 @@ struct VarianController: RouteCollection {
     func getOneVarian(req: Request) throws -> EventLoopFuture<Varian> {
         Varian.find(req.parameters.get("varian_id"), on: req.db)
             .unwrap(or: Abort(.notFound))
+    }
+
+    func getOneVarianByItemId(_ req: Request) throws -> EventLoopFuture<Varian> {
+        Varian.find(req.parameters.get("item_id"), on: req.db)
+            .unwrap(or: Abort(.notFound))
+    }
+
+    func deleteByItemId(_ req: Request) throws -> EventLoopFuture<HTTPStatus> {
+        let payload = try req.content.decode(DeleteByItemId.self)
+
+        return Varian.find(payload.user_id, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap { product in
+                guard product.user_id == payload.user_id  else{
+                    return req.eventLoop.future(error: Abort(.unauthorized))
+                } 
+                return product.delete(on: req.db).transform(to: .noContent)
+            }
     }
 }

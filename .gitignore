@@ -10,4 +10,5 @@ Package.resolved
 .env
 .env.development
 .env.production
-
+.vscode
+launch.json

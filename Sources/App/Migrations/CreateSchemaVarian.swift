@@ -7,8 +7,11 @@ struct CreateVarianSchema: Migration {
             .field("size", .string, .required)
             .field("sugar", .string, .required)
             .field("ice", .string, .required)
+            .field("item_id", .uuid, .required)
+            .field("user_id", .uuid, .required)
             .field("created_at", .datetime)
             .field("updated_at", .datetime)
+            .unique(on: "item_id")
             .create()
     }
 

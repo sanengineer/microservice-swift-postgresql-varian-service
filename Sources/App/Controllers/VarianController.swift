@@ -22,7 +22,7 @@ struct VarianController: RouteCollection {
             varianRoute.get(use: getOneVarian)
         }
 
-        varianAuthUser.delete(":item_id", use: deleteByItemId)
+        varianAuthUser.post(use: deleteByItemId)
     }
 
     func getAllVarian(req: Request) throws -> EventLoopFuture<[Varian]> {

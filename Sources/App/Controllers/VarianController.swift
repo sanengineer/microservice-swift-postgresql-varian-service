@@ -47,15 +47,11 @@ struct VarianController: RouteCollection {
     func deleteByItemId(_ req: Request) throws -> EventLoopFuture<HTTPStatus> {
         let payload = try req.content.decode(DeleteByItemId.self)
         //debug
-        print("payload", payload)
+        print("payload", payload.user_id)
         
-        return Varian.find(payload.user_id, on: req.db)
-            .unwrap(or: Abort(.notFound))
-            .flatMap { product in
-                guard product.user_id == payload.user_id  else{
-                    return req.eventLoop.future(error: Abort(.unauthorized))
-                } 
-                return product.delete(on: req.db).transform(to: .noContent)
-            }
+       return Varian.query(on: req.db)
+            .filter(\.$user_id == payload.user_id)
+            .delete()
+            .transform(to: .noContent)
     }
 }

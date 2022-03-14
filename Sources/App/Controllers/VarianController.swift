@@ -9,8 +9,8 @@ struct VarianController: RouteCollection {
         
         let varianRouteGroup = routes.grouped("varian")
 
-        let varianAuthSuperUser = varianRouteGroup.grouped(superUserMiddleware)
-        let varianAuthMidUser = varianRouteGroup.grouped(midUserMiddleware)
+        let _ = varianRouteGroup.grouped(superUserMiddleware)
+        let _ = varianRouteGroup.grouped(midUserMiddleware)
         let varianAuthUser = varianRouteGroup.grouped(userMiddleware)
 
         // varianAuthSuperUser.delete(":varian_id", use: delete)
@@ -22,7 +22,7 @@ struct VarianController: RouteCollection {
             varianRoute.get(use: getOneVarian)
         }
 
-        varianAuthUser.post(use: deleteByItemId)
+        varianAuthUser.delete(use: deleteByItemId)
     }
 
     func getAllVarian(req: Request) throws -> EventLoopFuture<[Varian]> {
@@ -46,7 +46,9 @@ struct VarianController: RouteCollection {
 
     func deleteByItemId(_ req: Request) throws -> EventLoopFuture<HTTPStatus> {
         let payload = try req.content.decode(DeleteByItemId.self)
-
+        //debug
+        print("payload", payload)
+        
         return Varian.find(payload.user_id, on: req.db)
             .unwrap(or: Abort(.notFound))
             .flatMap { product in

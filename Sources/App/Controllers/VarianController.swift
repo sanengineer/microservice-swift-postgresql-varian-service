@@ -51,6 +51,7 @@ struct VarianController: RouteCollection {
         
        return Varian.query(on: req.db)
             .filter(\.$user_id == payload.user_id)
+            .filter(\.$item_id == payload.item_id)
             .delete()
             .transform(to: .noContent)
     }
